@@ -1,11 +1,10 @@
-package me.simplicitee.superpower.entity;
+package me.simplicitee.superpower;
 
 import java.util.Map;
 import java.util.Optional;
 
 import org.bukkit.entity.Player;
 
-import me.simplicitee.superpower.Power;
 import me.simplicitee.superpower.ability.Ability;
 
 public final class PowerUser {
@@ -40,5 +39,9 @@ public final class PowerUser {
 		}
 		
 		return Optional.ofNullable(clazz.cast(instances.get(clazz)));
+	}
+	
+	public void addInstance(Ability ability) {
+		instances.put(ability.getClass(), ability);
 	}
 }

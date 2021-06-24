@@ -2,7 +2,7 @@ package me.simplicitee.superpower.ability;
 
 import org.bukkit.entity.Player;
 
-import me.simplicitee.superpower.entity.PowerUser;
+import me.simplicitee.superpower.PowerUser;
 
 public abstract class Ability {
 
@@ -34,6 +34,7 @@ public abstract class Ability {
 	
 	public final void start() {
 		startTime = System.currentTimeMillis();
+		user.addInstance(this);
 	}
 	
 	public final void stop() {

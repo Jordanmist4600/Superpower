@@ -3,12 +3,17 @@ package me.simplicitee.superpower.powers.superpower;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import me.simplicitee.superpower.PowerUser;
 import me.simplicitee.superpower.ability.Ability;
 import me.simplicitee.superpower.ability.Attribute;
-import me.simplicitee.superpower.entity.PowerUser;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class SuperPassive extends Ability {
 
+	private static final TextComponent BEAM_ON = new TextComponent(ChatColor.GREEN + "!> Eye Beams Armed <!");
+	private static final TextComponent BEAM_OFF = new TextComponent(ChatColor.RED + "!> Eye Beams Disarmed <!");
 	private static final PotionEffectType[] EFFECTS = {PotionEffectType.INCREASE_DAMAGE, PotionEffectType.DAMAGE_RESISTANCE, PotionEffectType.SPEED, PotionEffectType.FAST_DIGGING, PotionEffectType.JUMP, PotionEffectType.DOLPHINS_GRACE};
 	
 	@Attribute("Strength")
@@ -16,6 +21,8 @@ public class SuperPassive extends Ability {
 	
 	@Attribute("Speed")
 	private int speed;
+	
+	private boolean eyeBeams = false;
 	
 	public SuperPassive(PowerUser user, int strength, int speed) {
 		super(user);
@@ -44,4 +51,8 @@ public class SuperPassive extends Ability {
 		return true;
 	}
 
+	public void toggleEyeBeams() {
+		eyeBeams = !eyeBeams;
+		player.spigot().sendMessage(ChatMessageType.ACTION_BAR, eyeBeams ? BEAM_ON : BEAM_OFF);
+	}
 }

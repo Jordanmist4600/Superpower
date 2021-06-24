@@ -1,13 +1,13 @@
 package me.simplicitee.superpower.powers.common;
 
+import me.simplicitee.superpower.PowerUser;
 import me.simplicitee.superpower.ability.Ability;
 import me.simplicitee.superpower.ability.Attribute;
-import me.simplicitee.superpower.entity.PowerUser;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
-public class Flying extends Ability {
+public final class Flying extends Ability {
 	
 	private static final TextComponent GLIDE_ON = new TextComponent(ChatColor.GREEN + "!> Gliding mode enabled <!");
 	private static final TextComponent GLIDE_OFF = new TextComponent(ChatColor.RED + "!> Gliding mode disabled <!");

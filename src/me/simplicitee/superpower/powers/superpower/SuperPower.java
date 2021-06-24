@@ -1,18 +1,21 @@
 package me.simplicitee.superpower.powers.superpower;
 
+import org.bukkit.Color;
 import org.bukkit.event.Event;
 
 import me.simplicitee.superpower.Power;
+import me.simplicitee.superpower.PowerUser;
 import me.simplicitee.superpower.ability.Ability;
 import me.simplicitee.superpower.ability.Activation;
 import me.simplicitee.superpower.configuration.Configure;
-import me.simplicitee.superpower.entity.PowerUser;
 import me.simplicitee.superpower.powers.common.Flying;
+import me.simplicitee.superpower.powers.common.LaserEyebeams;
 import net.md_5.bungee.api.ChatColor;
 
 public class SuperPower extends Power {
 	
 	public static ChatColor SUPER_BLUE = ChatColor.of("#0074D9");
+	public static Color BLUE_COLOR = Color.fromRGB(SUPER_BLUE.getColor().getRGB());
 	
 	@Configure("Passive.Strength")
 	private int passiveStrength = 5;
@@ -22,6 +25,15 @@ public class SuperPower extends Power {
 	
 	@Configure("Flight.Speed")
 	private double flightSpeed = 2;
+	
+	@Configure("LaserEyebeams.Damage")
+	private double laserDamage = 2;
+	
+	@Configure("LaserEyebeams.Speed")
+	private double laserSpeed = 3;
+	
+	@Configure("LaserEyebeams.Range")
+	private double laserRange = 20;
 
 	public SuperPower() {
 		super("SuperPower", SUPER_BLUE, "Classic superhuman abilities like flight, strength, speed, and laser-eyebeams!");
@@ -34,7 +46,13 @@ public class SuperPower extends Power {
 		} else if (trigger == Activation.FLIGHT_TOGGLE) {
 			return new Flying(user, flightSpeed);
 		} else if (trigger == Activation.OFFHAND_TOGGLE) {
-			user.getInstanceOf(Flying.class).ifPresent((f) -> f.toggleGliding());
+			if (user.hasInstanceOf(Flying.class)) {
+				user.getInstanceOf(Flying.class).ifPresent((f) -> f.toggleGliding());
+			} else if (user.hasInstanceOf(SuperPassive.class)) {
+				user.getInstanceOf(SuperPassive.class).ifPresent((p) -> p.toggleEyeBeams());
+			}
+		} else if (trigger == Activation.SNEAK_DOWN) {
+			return new LaserEyebeams(user, BLUE_COLOR, (u) -> !u.getPlayer().isSneaking(), laserDamage, laserRange, laserSpeed);
 		}
 		
 		return null;

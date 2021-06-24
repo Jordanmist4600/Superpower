@@ -7,7 +7,6 @@ import org.bukkit.event.Event;
 import me.simplicitee.superpower.ability.Ability;
 import me.simplicitee.superpower.ability.Activation;
 import me.simplicitee.superpower.configuration.Configurable;
-import me.simplicitee.superpower.entity.PowerUser;
 import net.md_5.bungee.api.ChatColor;
 
 public abstract class Power implements Configurable {
