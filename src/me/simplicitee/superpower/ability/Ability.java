@@ -16,9 +16,9 @@ public abstract class Ability {
 		this.player = user.getPlayer();
 	}
 	
-	public abstract void onStart();
-	public abstract void onStop();
-	public abstract boolean onUpdate(double timeDelta);
+	protected abstract void onStart();
+	protected abstract void onStop();
+	protected abstract boolean onUpdate(double timeDelta);
 	
 	public final long getStartTime() {
 		return startTime;
@@ -35,9 +35,12 @@ public abstract class Ability {
 	public final void start() {
 		startTime = System.currentTimeMillis();
 		user.addInstance(this);
+		onStart();
 	}
 	
 	public final void stop() {
+		onStop();
+		user.removeInstance(this);
 		startTime = -1;
 		lifeTime = -1;
 	}

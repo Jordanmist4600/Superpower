@@ -8,12 +8,19 @@ public final class Activation {
 	private static final Map<String, Activation> CACHE = new HashMap<>();
 	
 	public static final Activation PASSIVE = of("passive");
-	public static final Activation SNEAK_UP = of("sneak_up");
 	public static final Activation LEFT_CLICK = of("left_click");
+	
+	public static final Activation SNEAK_UP = of("sneak_up");
 	public static final Activation SNEAK_DOWN = of("sneak_down");
-	public static final Activation FALL_DAMAGE = of("fall_damage");
-	public static final Activation FLIGHT_TOGGLE = of("flight_toggle");
-	public static final Activation OFFHAND_TOGGLE = of("offhand_toggle");
+	
+	public static final Activation FLIGHT_ON = of("flight_on");
+	public static final Activation FLIGHT_OFF = of("flight_off");
+	
+	public static final Activation SPRINT_ON = of("sprint_on");
+	public static final Activation SPRINT_OFF = of("sprint_off");
+	
+	public static final Activation OFFHAND_SWAP = of("offhand_toggle");
+	
 	public static final Activation RIGHT_CLICK_ITEM = of("right_click_item");
 	public static final Activation RIGHT_CLICK_BLOCK = of("right_click_block");
 	public static final Activation RIGHT_CLICK_ENTITY = of("right_click_entity");

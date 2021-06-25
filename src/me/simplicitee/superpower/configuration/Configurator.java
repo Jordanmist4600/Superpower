@@ -1,11 +1,16 @@
 package me.simplicitee.superpower.configuration;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public final class Configurator {
+	
+	private static final Map<Configurable, Configurator> CACHE = new HashMap<>();
 
 	private File file;
 	private FileConfiguration config;
@@ -66,5 +71,45 @@ public final class Configurator {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Gets the cached {@link Configurator} for the {@link Configurable}
+	 * object, or creates and caches a new one if nonexistent and returns that instead.
+	 * @param obj Object to be configured
+	 * @return configurator of the given configurable object
+	 */
+	public static Configurator from(Configurable obj) {
+		return CACHE.computeIfAbsent(obj, (o) -> new Configurator(o.getFile()));
+	}
+	
+	/**
+	 * Processes the given {@link Configurable} object, creating defaults
+	 * for and setting any fields with the {@link Configure} annotation in
+	 * the object to their respective values from the configuration file.
+	 * @param obj configurable object to process
+	 * @return the original object but configured
+	 */
+	public static <T extends Configurable> T process(T obj) {
+		FileConfiguration config = from(obj).getConfig();
+		
+		for (Field field : obj.getClass().getDeclaredFields()) {
+			if (!field.isAnnotationPresent(Configure.class)) {
+				continue;
+			}
+			
+			String path = field.getAnnotation(Configure.class).value();
+			if (!config.contains(path)) {
+				continue;
+			}
+			
+			try {
+				field.set(obj, config.get(path));
+			} catch (Exception e) {
+				continue;
+			}
+		}
+		
+		return obj;
 	}
 }

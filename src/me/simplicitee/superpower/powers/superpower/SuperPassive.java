@@ -22,7 +22,7 @@ public class SuperPassive extends Ability {
 	@Attribute("Speed")
 	private int speed;
 	
-	private boolean eyeBeams = false;
+	private boolean eyeBeams = false, flight;
 	
 	public SuperPassive(PowerUser user, int strength, int speed) {
 		super(user);
@@ -37,6 +37,9 @@ public class SuperPassive extends Ability {
 		for (int i = 0; i < EFFECTS.length; ++i) {
 			player.addPotionEffect(new PotionEffect(EFFECTS[i], Integer.MAX_VALUE, vals[i / 2], true, false, false));
 		}
+		
+		this.flight = player.getAllowFlight();
+		player.setAllowFlight(true);
 	}
 
 	@Override
@@ -44,6 +47,8 @@ public class SuperPassive extends Ability {
 		for (PotionEffectType type : EFFECTS) {
 			player.removePotionEffect(type);
 		}
+		
+		player.setAllowFlight(flight);
 	}
 
 	@Override

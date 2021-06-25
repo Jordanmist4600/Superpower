@@ -47,9 +47,9 @@ public class SuperPower extends Power {
 			return new Flying(user, flightSpeed);
 		} else if (trigger == Activation.OFFHAND_TOGGLE) {
 			if (user.hasInstanceOf(Flying.class)) {
-				user.getInstanceOf(Flying.class).ifPresent((f) -> f.toggleGliding());
+				user.getInstanceOf(Flying.class).get().toggleGliding();
 			} else if (user.hasInstanceOf(SuperPassive.class)) {
-				user.getInstanceOf(SuperPassive.class).ifPresent((p) -> p.toggleEyeBeams());
+				user.getInstanceOf(SuperPassive.class).get().toggleEyeBeams();
 			}
 		} else if (trigger == Activation.SNEAK_DOWN) {
 			return new LaserEyebeams(user, BLUE_COLOR, (u) -> !u.getPlayer().isSneaking(), laserDamage, laserRange, laserSpeed);

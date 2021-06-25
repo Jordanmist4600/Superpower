@@ -24,7 +24,20 @@ public abstract class Power implements Configurable {
 	}
 	
 	public abstract String getDisplayName();
+	
+	/**
+	 * Use this power with the given user and trigger with an optional event. The
+	 * event is passed through under <code>MONITOR</code> and cannot effect the event's outcome.
+	 * @param user Who to use the power for
+	 * @param trigger What activation did they use
+	 * @param provider optional for extra information
+	 * @return the ability or null if nothing happens
+	 */
 	public abstract Ability use(PowerUser user, Activation trigger, Event provider);
+	
+	public final Ability use(PowerUser user, Activation trigger) {
+		return use(user, trigger, null);
+	}
 	
 	@Override
 	public final File getFile() {
