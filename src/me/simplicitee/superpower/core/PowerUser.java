@@ -1,4 +1,4 @@
-package me.simplicitee.superpower;
+package me.simplicitee.superpower.core;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,8 +7,6 @@ import java.util.Optional;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
-import me.simplicitee.superpower.ability.Ability;
-import me.simplicitee.superpower.ability.Activation;
 import me.simplicitee.superpower.event.UserPowerChangeEvent;
 import me.simplicitee.superpower.util.EventUtil;
 
@@ -63,6 +61,15 @@ public final class PowerUser {
 		this.toggled = toggled;
 	}
 	
+	/**
+	 * Toggle this user's power, making them unable to use its abilities.
+	 * @return true for on, false for off
+	 */
+	public boolean toggle() {
+		this.setToggled(!toggled);
+		return toggled;
+	}
+	
 	public Optional<Ability> usePower(Activation trigger, Event provider) {
 		if (power == null || trigger == null) {
 			return Optional.empty();
@@ -83,11 +90,15 @@ public final class PowerUser {
 		return Optional.ofNullable(clazz.cast(instances.get(clazz)));
 	}
 	
-	public void addInstance(Ability ability) {
+	public void removeInstanceOf(Class<? extends Ability> clazz) {
+		instances.remove(clazz);
+	}
+	
+	void addInstance(Ability ability) {
 		instances.put(ability.getClass(), ability);
 	}
 	
-	public void removeInstance(Ability ability) {
+	void removeInstance(Ability ability) {
 		instances.remove(ability.getClass());
 	}
 }

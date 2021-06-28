@@ -3,8 +3,8 @@ package me.simplicitee.superpower.event;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import me.simplicitee.superpower.PowerManager;
-import me.simplicitee.superpower.ability.Ability;
+import me.simplicitee.superpower.core.Ability;
+import me.simplicitee.superpower.core.PowerManager;
 
 public class AbilityStopEvent extends Event {
 	

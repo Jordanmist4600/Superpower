@@ -1,4 +1,4 @@
-package me.simplicitee.superpower.ability;
+package me.simplicitee.superpower.core;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

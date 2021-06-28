@@ -3,8 +3,8 @@ package me.simplicitee.superpower.event;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import me.simplicitee.superpower.Power;
-import me.simplicitee.superpower.PowerUser;
+import me.simplicitee.superpower.core.Power;
+import me.simplicitee.superpower.core.PowerUser;
 
 public class UserPowerChangeEvent extends Event {
 

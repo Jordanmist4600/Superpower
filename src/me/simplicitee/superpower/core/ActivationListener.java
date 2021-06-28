@@ -1,22 +1,17 @@
-package me.simplicitee.superpower.ability;
+package me.simplicitee.superpower.core;
 
-import java.util.function.Predicate;
-
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityToggleGlideEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.inventory.EquipmentSlot;
-
-import me.simplicitee.superpower.PowerManager;
 
 public class ActivationListener implements Listener {
 	
@@ -46,6 +41,11 @@ public class ActivationListener implements Listener {
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onEntityClick(PlayerInteractEntityEvent event) {
+		PowerManager.activate(event.getPlayer(), Activation.RIGHT_CLICK_ENTITY, event);
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onOffhandSwap(PlayerSwapHandItemsEvent event) {
 		if (event.getMainHandItem() != null || event.getOffHandItem() != null) {
 			return;
@@ -57,15 +57,6 @@ public class ActivationListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onFlightToggle(PlayerToggleFlightEvent event) {
 		PowerManager.activate(event.getPlayer(), event.isFlying() ? Activation.FLIGHT_ON : Activation.FLIGHT_OFF, event);
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onGlideToggle(EntityToggleGlideEvent event) {
-		if (!(event.getEntity() instanceof Player)) {
-			return;
-		}
-		
-		
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

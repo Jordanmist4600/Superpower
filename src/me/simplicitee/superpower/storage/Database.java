@@ -36,6 +36,10 @@ public final class Database {
 	
 	public static ConnectedDatabase connectSQLite(String database, File folder) {
 		try {
+			if (!folder.exists()) {
+				folder.mkdirs();
+			}
+			
 			Class.forName("org.sqlite.JDBC");
 			
 			Connection c = DriverManager.getConnection("jdbc:sqlite:" + new File(folder, database + ".db").getAbsolutePath());

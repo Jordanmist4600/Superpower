@@ -1,8 +1,6 @@
-package me.simplicitee.superpower.ability;
+package me.simplicitee.superpower.core;
 
 import org.bukkit.entity.Player;
-
-import me.simplicitee.superpower.PowerUser;
 
 public abstract class Ability {
 
@@ -34,13 +32,13 @@ public abstract class Ability {
 	
 	public final void start() {
 		startTime = System.currentTimeMillis();
-		user.addInstance(this);
+		//user.addInstance(this);
 		onStart();
 	}
 	
 	public final void stop() {
 		onStop();
-		user.removeInstance(this);
+		//user.removeInstance(this);
 		startTime = -1;
 		lifeTime = -1;
 	}

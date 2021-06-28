@@ -4,7 +4,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import me.simplicitee.superpower.ability.Ability;
+import me.simplicitee.superpower.core.Ability;
 
 public class AbilityStartEvent extends Event implements Cancellable {
 

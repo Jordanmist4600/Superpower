@@ -1,11 +1,10 @@
-package me.simplicitee.superpower;
+package me.simplicitee.superpower.core;
 
 import java.io.File;
 
 import org.bukkit.event.Event;
 
-import me.simplicitee.superpower.ability.Ability;
-import me.simplicitee.superpower.ability.Activation;
+import me.simplicitee.superpower.SuperpowerPlugin;
 import me.simplicitee.superpower.configuration.Configurable;
 import net.md_5.bungee.api.ChatColor;
 

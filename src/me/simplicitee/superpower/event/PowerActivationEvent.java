@@ -4,8 +4,8 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import me.simplicitee.superpower.PowerUser;
-import me.simplicitee.superpower.ability.Activation;
+import me.simplicitee.superpower.core.Activation;
+import me.simplicitee.superpower.core.PowerUser;
 
 public class PowerActivationEvent extends Event implements Cancellable {
 	

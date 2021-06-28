@@ -1,25 +1,30 @@
-package me.simplicitee.superpower;
+package me.simplicitee.superpower.core;
 
 import static me.simplicitee.superpower.event.AbilityStopEvent.Reason.FORCED;
 import static me.simplicitee.superpower.event.AbilityStopEvent.Reason.NATURAL;
 
-import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
-import me.simplicitee.superpower.ability.Ability;
-import me.simplicitee.superpower.ability.Activation;
+import me.simplicitee.superpower.SuperpowerPlugin;
 import me.simplicitee.superpower.configuration.Configurator;
 import me.simplicitee.superpower.event.AbilityStartEvent;
 import me.simplicitee.superpower.event.AbilityStopEvent;
 import me.simplicitee.superpower.event.PowerActivationEvent;
+import me.simplicitee.superpower.powers.superpower.SuperPower;
 import me.simplicitee.superpower.storage.ConnectedDatabase;
 import me.simplicitee.superpower.storage.Database;
 import me.simplicitee.superpower.storage.DatabaseOptions;
@@ -30,6 +35,7 @@ public final class PowerManager {
 	private PowerManager() {}
 	
 	private static ConnectedDatabase db;
+	private static PreparedStatement getUser, newUser;
 	
 	private static final Map<String, Power> POWERS = new HashMap<>();
 	private static final Map<Class<? extends Power>, Power> CLASSES = new HashMap<>();
@@ -38,9 +44,36 @@ public final class PowerManager {
 	private static final Set<Ability> ACTIVE = new HashSet<>();
 	
 	private static long prevTime = System.currentTimeMillis();
+	private static boolean init = false;
 	
-	static void init(SuperpowerPlugin plugin) {
+	public static void init(SuperpowerPlugin plugin) {
+		if (init) {
+			return;
+		}
+		
 		db = Database.connect(Configurator.process(new DatabaseOptions()));
+		
+		if (db == null) {
+			plugin.getLogger().warning("Error loading configured database, resetting to defaults");
+			db = Database.connect(new DatabaseOptions());
+		}
+		
+		if (!db.tableExists("superpower_users")) {
+			try {
+				db.query("CREATE TABLE superpower_users (uuid varchar(16) PRIMARY KEY, power varchar(255) DEFAULT '', toggled varchar(5) DEFAULT 'true')");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		registerCore();
+		
+		init = true;
+		plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, PowerManager::tick, 0, 1);
+	}
+	
+	private static void registerCore() {
+		register(new SuperPower());
 	}
 	
 	public static <T extends Power> T register(T registree) {
@@ -52,6 +85,26 @@ public final class PowerManager {
 		POWERS.put(registree.internal(), registree);
 		CLASSES.put(registree.getClass(), registree);
 		return Configurator.process(registree);
+	}
+	
+	public static <T> List<T> list(Predicate<Power> filter, Function<Power, T> func) {
+		return POWERS.values().stream().filter(filter).map(func).collect(Collectors.toList());
+	}
+	
+	public static Optional<Power> get(String name) {
+		if (name == null) {
+			return Optional.empty();
+		}
+		
+		return Optional.ofNullable(POWERS.get(name.toLowerCase()));
+	}
+	
+	public static <T extends Power> Optional<T> get(Class<T> clazz) {
+		if (clazz == null) {
+			return Optional.empty();
+		}
+		
+		return Optional.ofNullable(clazz.cast(CLASSES.get(clazz)));
 	}
 	
 	public static boolean activate(Player player, Activation trigger, Event provider) {
@@ -102,14 +155,21 @@ public final class PowerManager {
 	}
 	
 	private static PowerUser loadOrCreateUser(Player player) {
-		ResultSet rs = db.query("SELECT * FROM superpower_users WHERE uuid = '" + player.getUniqueId().toString() + "'");
 		PowerUser user = new PowerUser(player);
 		
 		try {
-			if (rs.next()) {
-				user.setPower(POWERS.get(rs.getString("power")));
-				user.setToggled(rs.getBoolean("toggled"));
-			}
+			db.query(GET_USER.replace(player.getUniqueId()), (rs) -> {
+				try {
+					if (rs.next()) {
+						user.setPower(POWERS.get(rs.getString("power")));
+						user.setToggled(rs.getBoolean("toggled"));
+					} else {
+						db.query(NEW_USER.replace(player.getUniqueId()));
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

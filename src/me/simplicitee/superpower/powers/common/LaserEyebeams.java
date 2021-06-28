@@ -13,9 +13,9 @@ import org.bukkit.Particle.DustTransition;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
-import me.simplicitee.superpower.PowerUser;
-import me.simplicitee.superpower.ability.Ability;
-import me.simplicitee.superpower.ability.Attribute;
+import me.simplicitee.superpower.core.Ability;
+import me.simplicitee.superpower.core.Attribute;
+import me.simplicitee.superpower.core.PowerUser;
 import me.simplicitee.superpower.util.EntityUtil;
 import me.simplicitee.superpower.util.LocationUtil;
 

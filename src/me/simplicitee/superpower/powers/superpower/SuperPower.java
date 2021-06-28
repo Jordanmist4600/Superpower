@@ -3,11 +3,11 @@ package me.simplicitee.superpower.powers.superpower;
 import org.bukkit.Color;
 import org.bukkit.event.Event;
 
-import me.simplicitee.superpower.Power;
-import me.simplicitee.superpower.PowerUser;
-import me.simplicitee.superpower.ability.Ability;
-import me.simplicitee.superpower.ability.Activation;
 import me.simplicitee.superpower.configuration.Configure;
+import me.simplicitee.superpower.core.Ability;
+import me.simplicitee.superpower.core.Activation;
+import me.simplicitee.superpower.core.Power;
+import me.simplicitee.superpower.core.PowerUser;
 import me.simplicitee.superpower.powers.common.Flying;
 import me.simplicitee.superpower.powers.common.LaserEyebeams;
 import net.md_5.bungee.api.ChatColor;
@@ -43,9 +43,9 @@ public class SuperPower extends Power {
 	public Ability use(PowerUser user, Activation trigger, Event provider) {
 		if (trigger == Activation.PASSIVE) {
 			return new SuperPassive(user, passiveStrength, passiveSpeed);
-		} else if (trigger == Activation.FLIGHT_TOGGLE) {
+		} else if (trigger == Activation.FLIGHT_ON) {
 			return new Flying(user, flightSpeed);
-		} else if (trigger == Activation.OFFHAND_TOGGLE) {
+		} else if (trigger == Activation.OFFHAND_SWAP) {
 			if (user.hasInstanceOf(Flying.class)) {
 				user.getInstanceOf(Flying.class).get().toggleGliding();
 			} else if (user.hasInstanceOf(SuperPassive.class)) {

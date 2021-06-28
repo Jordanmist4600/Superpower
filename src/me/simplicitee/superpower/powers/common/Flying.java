@@ -1,8 +1,8 @@
 package me.simplicitee.superpower.powers.common;
 
-import me.simplicitee.superpower.PowerUser;
-import me.simplicitee.superpower.ability.Ability;
-import me.simplicitee.superpower.ability.Attribute;
+import me.simplicitee.superpower.core.Ability;
+import me.simplicitee.superpower.core.Attribute;
+import me.simplicitee.superpower.core.PowerUser;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;

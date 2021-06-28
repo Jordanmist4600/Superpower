@@ -1,4 +1,4 @@
-package me.simplicitee.superpower.ability;
+package me.simplicitee.superpower.core;
 
 import java.util.HashMap;
 import java.util.Map;
