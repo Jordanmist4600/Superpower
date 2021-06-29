@@ -59,23 +59,24 @@ public final class LaserEyebeams extends Ability {
 			return false;
 		}
 		
-		Iterator<Beam> iter = beams.iterator();
-		while (iter.hasNext()) {
-			Beam curr = iter.next();
-			if (curr.update(timeDelta)) {
-				player.getWorld().spawnParticle(Particle.DUST_COLOR_TRANSITION, curr.loc, 1, 0, 0, 0, dust);
-				
-				for (Entity e : EntityUtil.getNearby(curr.loc, 0.2, (e) -> e instanceof LivingEntity && !e.isDead())) {
-					((LivingEntity) e).damage(damage, player);
+		for (double d = 0; d < 1; d += 0.1) {
+			Iterator<Beam> iter = beams.iterator();
+			while (iter.hasNext()) {
+				Beam curr = iter.next();
+				if (curr.update(d * timeDelta)) {
+					player.getWorld().spawnParticle(Particle.DUST_COLOR_TRANSITION, curr.loc, 1, 0, 0, 0, dust);
+					
+					for (Entity e : EntityUtil.getNearby(curr.loc, 0.2, (e) -> e instanceof LivingEntity && !e.isDead() && e.getEntityId() != player.getEntityId())) {
+						((LivingEntity) e).damage(damage, player);
+					}
+				} else {
+					iter.remove();
 				}
-			} else {
-				iter.remove();
 			}
+			
+			beams.add(new Beam(LocationUtil.moveLeft(player.getEyeLocation(), 0.1)));
+			beams.add(new Beam(LocationUtil.moveRight(player.getEyeLocation(), 0.1)));
 		}
-		
-		beams.add(new Beam(LocationUtil.moveLeft(player.getEyeLocation(), 0.1)));
-		beams.add(new Beam(LocationUtil.moveRight(player.getEyeLocation(), 0.1)));
-		
 		return true;
 	}
 

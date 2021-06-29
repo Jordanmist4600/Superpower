@@ -28,7 +28,7 @@ public class PowerCommand implements CommandExecutor, TabCompleter {
 		if (args.length == 1) {
 			return CommandManager.listAll(CommandBase::getName);
 		} else if (args.length > 1) {
-			return CommandManager.get(args[0]).completeTab(sender, Arrays.asList(args).subList(2, args.length));
+			return CommandManager.get(args[0]).completeTab(sender, Arrays.asList(args).subList(1, args.length));
 		}
 		
 		return null;

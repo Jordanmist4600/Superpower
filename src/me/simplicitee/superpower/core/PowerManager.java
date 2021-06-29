@@ -244,6 +244,8 @@ public final class PowerManager {
 	
 	public static void disable() {
 		saveUsers();
+		ACTIVE.forEach((a) -> a.stop());
+		ACTIVE.clear();
 		USERS.clear();
 		POWERS.clear();
 		CLASSES.clear();

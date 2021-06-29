@@ -30,7 +30,7 @@ public class ActivationListener implements Listener {
 				PowerManager.activate(event.getPlayer(), Activation.PASSIVE, event);
 			}
 			
-		}.runTaskLater(SuperpowerPlugin.instance(), 10);
+		}.runTaskLater(SuperpowerPlugin.instance(), 100);
 	}
 	
 	@EventHandler
@@ -75,10 +75,6 @@ public class ActivationListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onOffhandSwap(PlayerSwapHandItemsEvent event) {
-		if (event.getMainHandItem() != null || event.getOffHandItem() != null) {
-			return;
-		}
-		
 		PowerManager.activate(event.getPlayer(), Activation.OFFHAND_SWAP, event);
 	}
 	

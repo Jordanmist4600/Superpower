@@ -56,7 +56,7 @@ public final class PowerUser {
 		if (toggled) {
 			PowerManager.activate(this, Activation.PASSIVE, null);
 		} else {
-			instances.clear();
+			clear();
 		}
 		
 		this.toggled = toggled;
@@ -72,7 +72,7 @@ public final class PowerUser {
 	}
 	
 	public Optional<Ability> usePower(Activation trigger, Event provider) {
-		if (power == null || trigger == null) {
+		if (!toggled || power == null || trigger == null) {
 			return Optional.empty();
 		}
 		

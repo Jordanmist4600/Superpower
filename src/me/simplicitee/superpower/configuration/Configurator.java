@@ -99,12 +99,13 @@ public final class Configurator {
 			}
 			
 			String path = field.getAnnotation(Configure.class).value();
-			if (!config.contains(path)) {
-				continue;
-			}
 			
 			try {
-				field.set(obj, config.get(path));
+				if (!config.contains(path)) {
+					config.addDefault(path, field.get(obj));
+				} else {
+					field.set(obj, config.get(path));
+				}
 			} catch (Exception e) {
 				continue;
 			}

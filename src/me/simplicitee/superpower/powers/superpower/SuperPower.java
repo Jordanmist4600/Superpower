@@ -7,6 +7,7 @@ import me.simplicitee.superpower.configuration.Configure;
 import me.simplicitee.superpower.core.Ability;
 import me.simplicitee.superpower.core.Activation;
 import me.simplicitee.superpower.core.Power;
+import me.simplicitee.superpower.core.PowerManager;
 import me.simplicitee.superpower.core.PowerUser;
 import me.simplicitee.superpower.powers.common.Flying;
 import me.simplicitee.superpower.powers.common.LaserEyebeams;
@@ -18,19 +19,19 @@ public class SuperPower extends Power {
 	public static Color BLUE_COLOR = Color.fromRGB(SUPER_BLUE.getColor().getRed(), SUPER_BLUE.getColor().getGreen(), SUPER_BLUE.getColor().getBlue());
 	
 	@Configure("Passive.Strength")
-	private int passiveStrength = 5;
+	private int passiveStrength = 2;
 	
 	@Configure("Passive.Speed")
 	private int passiveSpeed = 3;
 	
 	@Configure("Flight.Speed")
-	private double flightSpeed = 2;
+	private double flightSpeed = 1.3;
 	
 	@Configure("LaserEyebeams.Damage")
 	private double laserDamage = 2;
 	
 	@Configure("LaserEyebeams.Speed")
-	private double laserSpeed = 100;
+	private double laserSpeed = 40;
 	
 	@Configure("LaserEyebeams.Range")
 	private double laserRange = 20;
@@ -45,6 +46,8 @@ public class SuperPower extends Power {
 			return new SuperPassive(user, passiveStrength, passiveSpeed);
 		} else if (trigger == Activation.FLIGHT_ON) {
 			return new Flying(user, flightSpeed);
+		} else if (trigger == Activation.FLIGHT_OFF) {
+			user.getInstanceOf(Flying.class).ifPresent(PowerManager::remove);
 		} else if (trigger == Activation.OFFHAND_SWAP) {
 			if (user.hasInstanceOf(Flying.class)) {
 				user.getInstanceOf(Flying.class).get().toggleGliding();
