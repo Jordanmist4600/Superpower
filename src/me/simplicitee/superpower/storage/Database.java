@@ -12,7 +12,7 @@ public final class Database {
 		if (o.getType().equalsIgnoreCase("mysql")) {
 			return connectMySQL(o.getHost(), o.getPort(), o.getDatabase(), o.getUsername(), o.getPassword());
 		} else if (o.getType().equalsIgnoreCase("sqlite")) {
-			return connectSQLite("projectkorra", SuperpowerPlugin.instance().getDataFolder());
+			return connectSQLite("storage", SuperpowerPlugin.instance().getDataFolder());
 		}
 		
 		return null;
@@ -25,7 +25,7 @@ public final class Database {
 			Connection c = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, user, pass);
 			
 			if (c != null && !c.isClosed()) {
-				return new ConnectedDatabase(c);
+				return new ConnectedDatabase(c, ServerType.MYSQL);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -45,7 +45,7 @@ public final class Database {
 			Connection c = DriverManager.getConnection("jdbc:sqlite:" + new File(folder, database + ".db").getAbsolutePath());
 			
 			if (c != null && !c.isClosed()) {
-				return new ConnectedDatabase(c);
+				return new ConnectedDatabase(c, ServerType.SQLITE);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

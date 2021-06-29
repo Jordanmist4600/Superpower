@@ -1,0 +1,10 @@
+name: Superpower
+main: me.simplicitee.superpower.SuperpowerPlugin
+version: 1.0.0
+api-version: 1.16
+description: Fun superpowers in minecraft!
+author: Simplicitee
+commands:
+  superpower:
+    aliases: [super, power, sp]
+    usage: /<command>

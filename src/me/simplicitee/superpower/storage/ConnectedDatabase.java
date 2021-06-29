@@ -3,7 +3,6 @@ package me.simplicitee.superpower.storage;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -19,28 +18,25 @@ public class ConnectedDatabase {
 		this.serverType = serverType;
 	}
 	
-	private CompletableFuture<ResultSet> async(PreparedStatement stmt) {
-		return CompletableFuture.supplyAsync(() -> {
-			ResultSet rs = null;
-			
-			try {
-				if (stmt.execute()) {
-					rs = stmt.getResultSet();
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-			return rs;
-		});
-	}
-	
 	public ServerType getServerType() {
 		return serverType;
 	}
 	
-	public PreparedStatement prepare(String query) throws SQLException {
-		return connection.prepareStatement(query);
+	public PreparedStatement prepare(String query) {
+		try {
+			return connection.prepareStatement(query);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public void close() {
+		try {
+			connection.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -52,7 +48,15 @@ public class ConnectedDatabase {
 	 * @return the return of the given operation
 	 */
 	public <T> T query(PreparedStatement query, Function<ResultSet, T> operation) throws ExecutionException, InterruptedException {
+		if (query == null || operation == null) {
+			return null;
+		}
+		
 		return async(query).thenApply(operation).get();
+	}
+	
+	public <T> T query(String query, Function<ResultSet, T> operation) throws ExecutionException, InterruptedException {
+		return query(prepare(query), operation);
 	}
 	
 	/**
@@ -62,7 +66,15 @@ public class ConnectedDatabase {
 	 * @param operation function to apply to the result of the query
 	 */
 	public void query(PreparedStatement query, Consumer<ResultSet> operation) throws ExecutionException, InterruptedException {
+		if (query == null || operation == null) {
+			return;
+		}
+		
 		async(query).thenAccept(operation).get();
+	}
+	
+	public void query(String query, Consumer<ResultSet> operation) throws ExecutionException, InterruptedException {
+		query(prepare(query), operation);
 	}
 	
 	/**
@@ -71,7 +83,15 @@ public class ConnectedDatabase {
 	 * @param replacements will be used in order to replace <code>?</code> in the query
 	 */
 	public void query(PreparedStatement query) throws ExecutionException, InterruptedException {
+		if (query == null) {
+			return;
+		}
+		
 		async(query).get();
+	}
+	
+	public void query(String query) throws ExecutionException, InterruptedException {
+		query(prepare(query));
 	}
 	
 	public boolean tableExists(String name) {
@@ -81,5 +101,21 @@ public class ConnectedDatabase {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	private CompletableFuture<ResultSet> async(PreparedStatement stmt) {
+		return CompletableFuture.supplyAsync(() -> {
+			ResultSet rs = null;
+			
+			try {
+				if (stmt.execute()) {
+					rs = stmt.getResultSet();
+				}
+				stmt.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return rs;
+		});
 	}
 }

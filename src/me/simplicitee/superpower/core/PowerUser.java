@@ -41,6 +41,7 @@ public final class PowerUser {
 		
 		instances.clear();
 		this.power = event.getResult();
+		PowerManager.activate(this, Activation.PASSIVE, null);
 	}
 	
 	public boolean isToggled() {
@@ -100,5 +101,12 @@ public final class PowerUser {
 	
 	void removeInstance(Ability ability) {
 		instances.remove(ability.getClass());
+	}
+	
+	void clear() {
+		for (Ability instance : instances.values()) {
+			PowerManager.remove(instance);
+		}
+		instances.clear();
 	}
 }

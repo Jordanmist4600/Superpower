@@ -7,13 +7,41 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import me.simplicitee.superpower.SuperpowerPlugin;
 
 public class ActivationListener implements Listener {
+	
+	@EventHandler
+	public void onJoin(PlayerJoinEvent event) {
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				PowerManager.activate(event.getPlayer(), Activation.PASSIVE, event);
+			}
+			
+		}.runTaskLater(SuperpowerPlugin.instance(), 10);
+	}
+	
+	@EventHandler
+	public void onQuit(PlayerQuitEvent event) {
+		PowerManager.clearUser(event.getPlayer());
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onKick(PlayerKickEvent event) {
+		PowerManager.clearUser(event.getPlayer());
+	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onClick(PlayerInteractEvent event) {

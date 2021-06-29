@@ -1,5 +1,5 @@
 package me.simplicitee.superpower.storage;
 
-public class ServerType {
-
+public enum ServerType {
+	MYSQL, SQLITE;
 }

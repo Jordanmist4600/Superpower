@@ -30,20 +30,20 @@ public abstract class Ability {
 		return user;
 	}
 	
-	public final void start() {
+	final void start() {
 		startTime = System.currentTimeMillis();
-		//user.addInstance(this);
+		user.addInstance(this);
 		onStart();
 	}
 	
-	public final void stop() {
+	final void stop() {
 		onStop();
-		//user.removeInstance(this);
+		user.removeInstance(this);
 		startTime = -1;
 		lifeTime = -1;
 	}
 	
-	public final boolean update(double timeDelta) {
+	final boolean update(double timeDelta) {
 		++lifeTime;
 		return onUpdate(timeDelta);
 	}

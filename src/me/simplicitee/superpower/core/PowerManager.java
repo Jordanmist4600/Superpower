@@ -35,7 +35,7 @@ public final class PowerManager {
 	private PowerManager() {}
 	
 	private static ConnectedDatabase db;
-	private static PreparedStatement getUser, newUser;
+	private static PreparedStatement getUser, newUser, updUser, createTable;
 	
 	private static final Map<String, Power> POWERS = new HashMap<>();
 	private static final Map<Class<? extends Power>, Power> CLASSES = new HashMap<>();
@@ -46,9 +46,9 @@ public final class PowerManager {
 	private static long prevTime = System.currentTimeMillis();
 	private static boolean init = false;
 	
-	public static void init(SuperpowerPlugin plugin) {
+	public static boolean init(SuperpowerPlugin plugin) {
 		if (init) {
-			return;
+			return false;
 		}
 		
 		db = Database.connect(Configurator.process(new DatabaseOptions()));
@@ -58,21 +58,30 @@ public final class PowerManager {
 			db = Database.connect(new DatabaseOptions());
 		}
 		
-		getUser = db.prepare("SELECT * FROM superpower_users WHERE uuid = ?;");
-		newUser = db.prepare("INSERT INTO superpower_users (uuid) VALUES (?);");
+		switch (db.getServerType()) {
+		case MYSQL:
+			createTable = db.prepare("CREATE TABLE IF NOT EXISTS superpower_users (uuid VARCHAR(16) PRIMARY KEY, power VARCHAR(255) DEFAULT '', toggled BOOLEAN DEFAULT 'true');");
+			break;
+		case SQLITE:
+			createTable = db.prepare("CREATE TABLE IF NOT EXISTS superpower_users (uuid TEXT PRIMARY KEY, power TEXT DEFAULT '', toggled NUMERIC DEFAULT 'true');");
+			break;
+		}
 		
-		if (!db.tableExists("superpower_users")) {
-			try {
-				db.query("CREATE TABLE superpower_users (uuid varchar(16) PRIMARY KEY, power varchar(255) DEFAULT '', toggled varchar(5) DEFAULT 'true')");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		try {
+			db.query(createTable);
+			getUser = db.prepare("SELECT * FROM superpower_users WHERE uuid = ?;");
+			newUser = db.prepare("INSERT INTO superpower_users (uuid) VALUES (?);");
+			updUser = db.prepare("UPDATE superpower_users SET power = ?, toggled = ? WHERE uuid = ?;");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
 		}
 		
 		registerCore();
 		
 		init = true;
 		plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, PowerManager::tick, 0, 1);
+		return true;
 	}
 	
 	private static void registerCore() {
@@ -82,10 +91,10 @@ public final class PowerManager {
 	public static <T extends Power> T register(T registree) {
 		Validate.notNull(registree, "Cannot register null power!");
 		Validate.notNull(registree.getName(), "Cannot register power with null name!");
-		Validate.isTrue(!POWERS.containsKey(registree.internal()), "Cannot register '" + registree.getName() + "', name already used!");
+		Validate.isTrue(!POWERS.containsKey(registree.getName().toLowerCase()), "Cannot register '" + registree.getName() + "', name already used!");
 		Validate.isTrue(!CLASSES.containsKey(registree.getClass()), "Cannot register '" + registree.getName() + "', class already registered!");
 		
-		POWERS.put(registree.internal(), registree);
+		POWERS.put(registree.getName().toLowerCase(), registree);
 		CLASSES.put(registree.getClass(), registree);
 		return Configurator.process(registree);
 	}
@@ -144,7 +153,6 @@ public final class PowerManager {
 		}
 		
 		stop(ability, FORCED);
-		
 		ACTIVE.remove(ability);
 	}
 	
@@ -161,13 +169,15 @@ public final class PowerManager {
 		PowerUser user = new PowerUser(player);
 		
 		try {
-			db.query(GET_USER.replace(player.getUniqueId()), (rs) -> {
+			getUser.setString(1, player.getUniqueId().toString());
+			db.query(getUser, (rs) -> {
 				try {
 					if (rs.next()) {
 						user.setPower(POWERS.get(rs.getString("power")));
 						user.setToggled(rs.getBoolean("toggled"));
 					} else {
-						db.query(NEW_USER.replace(player.getUniqueId()));
+						newUser.setString(1, player.getUniqueId().toString());
+						db.query(newUser);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -178,6 +188,66 @@ public final class PowerManager {
 		}
 		
 		return user;
+	}
+	
+	public static void saveUser(PowerUser user) {
+		if (user == null) {
+			return;
+		}
+		
+		try {
+			updUser.setString(1, user.getPower().getName());
+			updUser.setBoolean(2, user.isToggled());
+			updUser.setString(3, user.getPlayer().getUniqueId().toString());
+			db.query(updUser);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void saveUser(Player player) {
+		saveUser(USERS.get(player));
+	}
+	
+	public static void clearUser(PowerUser user) {
+		if (user == null) {
+			return;
+		}
+		
+		saveUser(user);
+		user.clear();
+		USERS.remove(user.getPlayer());
+	}
+	
+	public static void clearUser(Player player) {
+		clearUser(USERS.get(player));
+	}
+	
+	public static void saveUsers() {
+		if (USERS.isEmpty()) {
+			return;
+		}
+		
+		try {
+			for (PowerUser user : USERS.values()) {
+				updUser.setString(1, user.getPower().getName());
+				updUser.setBoolean(2, user.isToggled());
+				updUser.setString(3, user.getPlayer().getUniqueId().toString());
+				updUser.addBatch();
+			}
+			
+			db.query(updUser);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void disable() {
+		saveUsers();
+		USERS.clear();
+		POWERS.clear();
+		CLASSES.clear();
+		db.close();
 	}
 	
 	static void tick() {

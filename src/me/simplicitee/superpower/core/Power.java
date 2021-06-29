@@ -11,11 +11,10 @@ import net.md_5.bungee.api.ChatColor;
 public abstract class Power implements Configurable {
 	
 	private File file;
-	private String name, internal, description;
+	private String name, description;
 	private ChatColor color;
 	
 	public Power(String name, ChatColor color, String description) {
-		this.internal = ChatColor.stripColor(name).trim().toLowerCase();
 		this.name = name;
 		this.color = color;
 		this.description = description;
@@ -45,10 +44,6 @@ public abstract class Power implements Configurable {
 	
 	public final String getName() {
 		return name;
-	}
-	
-	public final String internal() {
-		return internal;
 	}
 	
 	public final String getDescription() {

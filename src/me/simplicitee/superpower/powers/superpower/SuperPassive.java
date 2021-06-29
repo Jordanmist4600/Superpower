@@ -60,4 +60,8 @@ public class SuperPassive extends Ability {
 		eyeBeams = !eyeBeams;
 		player.spigot().sendMessage(ChatMessageType.ACTION_BAR, eyeBeams ? BEAM_ON : BEAM_OFF);
 	}
+	
+	public boolean isEyeBeamsToggled() {
+		return eyeBeams;
+	}
 }

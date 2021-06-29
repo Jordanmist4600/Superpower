@@ -15,7 +15,7 @@ import net.md_5.bungee.api.ChatColor;
 public class SuperPower extends Power {
 	
 	public static ChatColor SUPER_BLUE = ChatColor.of("#0074D9");
-	public static Color BLUE_COLOR = Color.fromRGB(SUPER_BLUE.getColor().getRGB());
+	public static Color BLUE_COLOR = Color.fromRGB(SUPER_BLUE.getColor().getRed(), SUPER_BLUE.getColor().getGreen(), SUPER_BLUE.getColor().getBlue());
 	
 	@Configure("Passive.Strength")
 	private int passiveStrength = 5;
@@ -30,7 +30,7 @@ public class SuperPower extends Power {
 	private double laserDamage = 2;
 	
 	@Configure("LaserEyebeams.Speed")
-	private double laserSpeed = 3;
+	private double laserSpeed = 100;
 	
 	@Configure("LaserEyebeams.Range")
 	private double laserRange = 20;
@@ -52,7 +52,9 @@ public class SuperPower extends Power {
 				user.getInstanceOf(SuperPassive.class).get().toggleEyeBeams();
 			}
 		} else if (trigger == Activation.SNEAK_DOWN) {
-			return new LaserEyebeams(user, BLUE_COLOR, (u) -> !u.getPlayer().isSneaking(), laserDamage, laserRange, laserSpeed);
+			if (!user.hasInstanceOf(SuperPassive.class) || user.getInstanceOf(SuperPassive.class).get().isEyeBeamsToggled()) {
+				return new LaserEyebeams(user, BLUE_COLOR, (u) -> !u.getPlayer().isSneaking(), laserDamage, laserRange, laserSpeed);
+			}
 		}
 		
 		return null;
