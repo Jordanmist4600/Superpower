@@ -58,6 +58,9 @@ public final class PowerManager {
 			db = Database.connect(new DatabaseOptions());
 		}
 		
+		getUser = db.prepare("SELECT * FROM superpower_users WHERE uuid = ?;");
+		newUser = db.prepare("INSERT INTO superpower_users (uuid) VALUES (?);");
+		
 		if (!db.tableExists("superpower_users")) {
 			try {
 				db.query("CREATE TABLE superpower_users (uuid varchar(16) PRIMARY KEY, power varchar(255) DEFAULT '', toggled varchar(5) DEFAULT 'true')");
