@@ -35,6 +35,7 @@ public final class CommandManager {
 		register(new PowerRemoveCommand());
 		register(new PowerSetCommand());
 		register(new PowerToggleCommand());
+		register(new PowerWhoCommand());
 	}
 	
 	public static void register(CommandBase command) {

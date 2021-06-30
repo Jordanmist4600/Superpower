@@ -32,6 +32,6 @@ public class SuperpowerPlugin extends JavaPlugin {
 	}
 	
 	public static File configurationFolder(String folder) {
-		return new File(instance().getDataFolder() + File.pathSeparator + "/configuration/" + File.pathSeparator + "/" + folder + "/");
+		return new File(instance().getDataFolder() + "/configuration/" + folder + "/");
 	}
 }

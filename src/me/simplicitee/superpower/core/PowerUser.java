@@ -1,5 +1,6 @@
 package me.simplicitee.superpower.core;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -104,9 +105,8 @@ public final class PowerUser {
 	}
 	
 	void clear() {
-		for (Ability instance : instances.values()) {
+		for (Ability instance : new ArrayList<>(instances.values())) {
 			PowerManager.remove(instance);
 		}
-		instances.clear();
 	}
 }

@@ -14,7 +14,7 @@ public class SuperPassive extends Ability {
 
 	private static final TextComponent BEAM_ON = new TextComponent(ChatColor.GREEN + "!> Eye Beams Armed <!");
 	private static final TextComponent BEAM_OFF = new TextComponent(ChatColor.RED + "!> Eye Beams Disarmed <!");
-	private static final PotionEffectType[] EFFECTS = {PotionEffectType.INCREASE_DAMAGE, PotionEffectType.DAMAGE_RESISTANCE, PotionEffectType.SPEED, PotionEffectType.FAST_DIGGING, PotionEffectType.JUMP, PotionEffectType.DOLPHINS_GRACE};
+	private static final PotionEffectType[] EFFECTS = {PotionEffectType.INCREASE_DAMAGE, PotionEffectType.DAMAGE_RESISTANCE, PotionEffectType.SPEED, PotionEffectType.FAST_DIGGING, PotionEffectType.JUMP, PotionEffectType.DOLPHINS_GRACE, PotionEffectType.SLOW_FALLING};
 	
 	@Attribute("Strength")
 	private int strength;
@@ -32,7 +32,7 @@ public class SuperPassive extends Ability {
 
 	@Override
 	public void onStart() {
-		int[] vals = {strength, speed, Math.round((strength + speed) / 2f)};
+		int[] vals = {strength, speed, Math.round((strength + speed) / 2f), 0};
 		
 		for (int i = 0; i < EFFECTS.length; ++i) {
 			player.addPotionEffect(new PotionEffect(EFFECTS[i], Integer.MAX_VALUE, vals[i / 2], true, false, false));

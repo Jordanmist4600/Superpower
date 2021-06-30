@@ -19,7 +19,7 @@ public class SuperPower extends Power {
 	public static Color BLUE_COLOR = Color.fromRGB(SUPER_BLUE.getColor().getRed(), SUPER_BLUE.getColor().getGreen(), SUPER_BLUE.getColor().getBlue());
 	
 	@Configure("Passive.Strength")
-	private int passiveStrength = 2;
+	private int passiveStrength = 3;
 	
 	@Configure("Passive.Speed")
 	private int passiveSpeed = 3;

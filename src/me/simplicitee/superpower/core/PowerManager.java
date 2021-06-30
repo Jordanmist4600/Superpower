@@ -3,7 +3,7 @@ package me.simplicitee.superpower.core;
 import static me.simplicitee.superpower.event.AbilityStopEvent.Reason.FORCED;
 import static me.simplicitee.superpower.event.AbilityStopEvent.Reason.NATURAL;
 
-import java.sql.PreparedStatement;
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,19 +23,17 @@ import me.simplicitee.superpower.SuperpowerPlugin;
 import me.simplicitee.superpower.configuration.Configurator;
 import me.simplicitee.superpower.event.AbilityStartEvent;
 import me.simplicitee.superpower.event.AbilityStopEvent;
+import me.simplicitee.superpower.event.AbilityStopEvent.Reason;
 import me.simplicitee.superpower.event.PowerActivationEvent;
 import me.simplicitee.superpower.powers.superpower.SuperPower;
-import me.simplicitee.superpower.storage.ConnectedDatabase;
-import me.simplicitee.superpower.storage.Database;
-import me.simplicitee.superpower.storage.DatabaseOptions;
+import me.simplicitee.superpower.powers.superspeed.Superspeed;
 import me.simplicitee.superpower.util.EventUtil;
 
 public final class PowerManager {
 
 	private PowerManager() {}
 	
-	private static ConnectedDatabase db;
-	private static PreparedStatement getUser, newUser, updUser, createTable;
+	private static Configurator storage;
 	
 	private static final Map<String, Power> POWERS = new HashMap<>();
 	private static final Map<Class<? extends Power>, Power> CLASSES = new HashMap<>();
@@ -51,31 +49,7 @@ public final class PowerManager {
 			return false;
 		}
 		
-		db = Database.connect(Configurator.process(new DatabaseOptions()));
-		
-		if (db == null) {
-			plugin.getLogger().warning("Error loading configured database, resetting to defaults");
-			db = Database.connect(new DatabaseOptions());
-		}
-		
-		switch (db.getServerType()) {
-		case MYSQL:
-			createTable = db.prepare("CREATE TABLE IF NOT EXISTS superpower_users (uuid VARCHAR(16) PRIMARY KEY, power VARCHAR(255) DEFAULT '', toggled BOOLEAN DEFAULT 'true');");
-			break;
-		case SQLITE:
-			createTable = db.prepare("CREATE TABLE IF NOT EXISTS superpower_users (uuid TEXT PRIMARY KEY, power TEXT DEFAULT '', toggled NUMERIC DEFAULT 'true');");
-			break;
-		}
-		
-		try {
-			db.query(createTable);
-			getUser = db.prepare("SELECT * FROM superpower_users WHERE uuid = ?;");
-			newUser = db.prepare("INSERT INTO superpower_users (uuid) VALUES (?);");
-			updUser = db.prepare("UPDATE superpower_users SET power = ?, toggled = ? WHERE uuid = ?;");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+		storage = new Configurator(new File(plugin.getDataFolder(), "storage.yml"), "NOT TO BE MODIFIED");
 		
 		registerCore();
 		
@@ -86,6 +60,7 @@ public final class PowerManager {
 	
 	private static void registerCore() {
 		register(new SuperPower());
+		register(new Superspeed());
 	}
 	
 	public static <T extends Power> T register(T registree) {
@@ -156,7 +131,7 @@ public final class PowerManager {
 		ACTIVE.remove(ability);
 	}
 	
-	private static void stop(Ability ability, AbilityStopEvent.Reason reason) {
+	static void stop(Ability ability, Reason reason) {
 		EventUtil.call(new AbilityStopEvent(ability, reason));
 		ability.stop();
 	}
@@ -168,23 +143,11 @@ public final class PowerManager {
 	private static PowerUser loadOrCreateUser(Player player) {
 		PowerUser user = new PowerUser(player);
 		
-		try {
-			getUser.setString(1, player.getUniqueId().toString());
-			db.query(getUser, (rs) -> {
-				try {
-					if (rs.next()) {
-						user.setPower(POWERS.get(rs.getString("power")));
-						user.setToggled(rs.getBoolean("toggled"));
-					} else {
-						newUser.setString(1, player.getUniqueId().toString());
-						db.query(newUser);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			});
-		} catch (Exception e) {
-			e.printStackTrace();
+		String uuid = player.getUniqueId().toString();
+		
+		if (storage.getConfig().contains(uuid)) {
+			user.setPower(POWERS.get(storage.getConfig().getString(uuid + ".power").toLowerCase()));
+			user.setToggled(storage.getConfig().getBoolean(uuid + ".toggled"));
 		}
 		
 		return user;
@@ -195,14 +158,9 @@ public final class PowerManager {
 			return;
 		}
 		
-		try {
-			updUser.setString(1, user.getPower().getName());
-			updUser.setBoolean(2, user.isToggled());
-			updUser.setString(3, user.getPlayer().getUniqueId().toString());
-			db.query(updUser);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		storage.getConfig().set(user.getPlayer().getUniqueId().toString() + ".power", user.getPower().getName());
+		storage.getConfig().set(user.getPlayer().getUniqueId().toString() + ".toggled", user.isToggled());
+		storage.save();
 	}
 	
 	public static void saveUser(Player player) {
@@ -228,18 +186,7 @@ public final class PowerManager {
 			return;
 		}
 		
-		try {
-			for (PowerUser user : USERS.values()) {
-				updUser.setString(1, user.getPower().getName());
-				updUser.setBoolean(2, user.isToggled());
-				updUser.setString(3, user.getPlayer().getUniqueId().toString());
-				updUser.addBatch();
-			}
-			
-			db.query(updUser);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		USERS.values().forEach(PowerManager::saveUser);
 	}
 	
 	public static void disable() {
@@ -249,7 +196,6 @@ public final class PowerManager {
 		USERS.clear();
 		POWERS.clear();
 		CLASSES.clear();
-		db.close();
 	}
 	
 	static void tick() {

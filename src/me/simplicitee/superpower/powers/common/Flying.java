@@ -15,7 +15,7 @@ public final class Flying extends Ability {
 	@Attribute("Speed")
 	private double speed;
 	
-	private boolean gliding = false, flying;
+	private boolean gliding = false;
 	private float original;
 	
 	public Flying(PowerUser user, double speed) {
@@ -25,14 +25,14 @@ public final class Flying extends Ability {
 
 	@Override
 	public void onStart() {
-		this.flying = player.isFlying();
 		this.original = player.getFlySpeed();
+		player.setFlying(true);
 		player.setFlySpeed(Math.min(1, (float) speed / 10));
 	}
 
 	@Override
 	public void onStop() {
-		player.setFlying(flying);
+		player.setFlying(false);
 		player.setFlySpeed(original);
 	}
 
@@ -41,8 +41,6 @@ public final class Flying extends Ability {
 		player.setGliding(gliding);
 		if (gliding) {
 			player.setVelocity(player.getLocation().getDirection().multiply(speed));
-		} else {
-			player.setFlying(true);
 		}
 		
 		return true;

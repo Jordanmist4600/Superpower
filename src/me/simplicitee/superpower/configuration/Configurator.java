@@ -111,6 +111,8 @@ public final class Configurator {
 			}
 		}
 		
+		from(obj).save();
+		
 		return obj;
 	}
 }
