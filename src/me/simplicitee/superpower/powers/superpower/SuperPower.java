@@ -37,7 +37,7 @@ public class SuperPower extends Power {
 	private double laserRange = 20;
 
 	public SuperPower() {
-		super("SuperPower", SUPER_BLUE, "Classic superhuman abilities like flight, strength, speed, and laser-eyebeams!");
+		super("SuperPower", SUPER_BLUE, "Classic superhero abilities like flight, strength, speed, and laser-eyebeams!");
 	}
 
 	@Override
